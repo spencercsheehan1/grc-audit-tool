@@ -32,12 +32,12 @@ Please run this script with a token in the GITHUB_TOKEN environment variable.
 
 ## Environment Variables
 Set the environment variables prior to running the script each time per audit, Here's an example:
-    
-		export GITHUB_TOKEN={token_value}
-    export START_DATE={YYYY-MM-DD}
-    export END_DATE={YYYY-MM-DD}
-    export GITHUB_REPOS={list of repos}
-    OUTPUT DIR = os-environ {[Output Directory]}
+
+	export GITHUB_TOKEN={token_value}
+	export START_DATE={YYYY-MM-DD}
+	export END_DATE={YYYY-MM-DD}
+	export GITHUB_REPOS={list of repos}
+	OUTPUT DIR = os-environ {[Output Directory]}
 
 ## Date Range
 The script filters pull requests by the date range specified in the start date and end date variables.
