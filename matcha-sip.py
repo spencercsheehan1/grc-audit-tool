@@ -5,8 +5,8 @@ import json
 import os
 from datetime import datetime, time
 
+# Environment variables are defined by the user running the script prior to actual script run.
 OWNER = "your-repo-name"
-# these variables are defined by the user running the script prior to actual script run.
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 REPOS = os.environ["REPOS"].split(',')
 OUTPUT_DIR = os.environ["OUTPUT_DIR"]
@@ -55,8 +55,7 @@ def request_github_api(page, REPO):
         print(f"Retries remaining: {retries - i}")
         response = requests.get(
             f"https://api.github.com/repos/{OWNER}/{REPO}/pulls?state=closed&per_page=100&page={page}",
-            headers=headers
-        )
+            headers=headers)
         if response.status_code == 200:
             return response.json(), None
         elif response.status_code == 403:
