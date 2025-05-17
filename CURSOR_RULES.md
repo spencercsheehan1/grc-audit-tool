@@ -117,3 +117,29 @@ Potential enhancements could include:
 - Command-line arguments for configuration
 - Support for GitHub Enterprise
 - Concurrent repository processing 
+
+# Branch Naming Guide
+
+A concise convention for naming Git branches in this Python project. Following these rules keeps our history tidy, lets automation do its job, and helps new contributors ramp up quickly.
+
+## 1 Primary Format
+
+| Rule | Description | Example | Notes |
+|------|-------------|---------|--------|
+| kebab-case | Lower-case words separated by hyphens | `stone-mill-upgrade` | |
+| Prefix | Namespace that explains why the branch exists | `feature/`, `bugfix/`, `hotfix/`, `chore/`, `docs/` | |
+| No spaces | Spaces break Git commands & URLs | ✅ `feature/first-harvest` ❌ `feature/first harvest` | |
+| Avoid punctuation | Only hyphens (-) and forward-slash prefix are allowed | `bugfix/umami-boost-overflow` | |
+
+**TL;DR** — `<prefix>/<kebab-case-summary>`
+
+## 2 Matcha-Themed A–Z Stubs
+
+Pick the next unused stub (or choose one that best fits your work). Combine it with a prefix to form the final branch name.
+
+| Letter | Stub (kebab-case) | Quick Note |
+|--------|------------------|------------|
+| A | aerated-leaves | Air-dried leaves; a light starting point |
+| B | bitter-balance | Tweaking bitterness vs. sweetness |
+| C | ceremonial-grade | Highest matcha quality |
+| D | deep-steam | Longer steaming step | 
