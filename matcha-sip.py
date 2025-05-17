@@ -76,3 +76,54 @@ for REPO in REPOS:
     stop_fetching = False  # <-- Flag for stopping the while loop
     while not stop_fetching:
         print(f"Processing page {page} for repository {REPO}")
+        data, error = request_github_api(page, REPO)
+        
+        # Check if the request was successful
+        if error:
+            failed_requests.append({"page": page, "error": error})
+            break
+            
+        if not data:  # Empty response means we've reached the end
+            stop_fetching = True
+            continue
+            
+        for pr in data:
+            merged_at = pr.get('merged_at')
+            if not merged_at:
+                continue
+                
+            merged_date = datetime.strptime(merged_at, '%Y-%m-%dT%H:%M:%SZ')
+            if start_date <= merged_date <= end_date:
+                pr_info = {
+                    "number": pr['number'],
+                    "title": pr['title'],
+                    "merged_at": merged_at,
+                    "url": pr['html_url']
+                }
+                merged_pull_requests.append(pr_info)
+            elif merged_date < start_date:  # If we've gone past our date range
+                stop_fetching = True
+                break
+                
+        page += 1
+
+    # Write results to file
+    with open(OUTPUT_FILE_PATH, 'w') as f:
+        f.write(f"Pull Requests for {REPO} between {start_date.date()} and {end_date.date()}\n")
+        f.write("-" * 80 + "\n\n")
+        
+        if merged_pull_requests:
+            for pr in merged_pull_requests:
+                f.write(f"#{pr['number']} - {pr['title']}\n")
+                f.write(f"Merged at: {pr['merged_at']}\n")
+                f.write(f"URL: {pr['url']}\n\n")
+        else:
+            f.write("No pull requests found in the specified date range.\n")
+            
+        if failed_requests:
+            f.write("\nFailed Requests:\n")
+            f.write("-" * 80 + "\n")
+            for fail in failed_requests:
+                f.write(f"Page {fail['page']}: {fail['error']}\n")
+
+print("Script execution completed. Check the output files in the specified directory.")
