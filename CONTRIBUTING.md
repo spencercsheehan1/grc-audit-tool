@@ -66,7 +66,12 @@ Prefer sequential order (A→Z) when possible; if the ideal word is out of order
 If you *must* stick to underscores (e.g., organization policy), mirror the stub with underscores:
 
 ```
-aerated_leaves  bitter_balance  ceremonial_grade  deep_steam  ...  zen_finish
+- aerated_leaves
+- bitter_balance
+- ceremonial_grade
+- deep_steam
+- ...
+- zen_finish
 ```
 
 > **Recommendation:** Keep branch names in kebab‑case; use snake\_case only for file or variable names inside the codebase.
