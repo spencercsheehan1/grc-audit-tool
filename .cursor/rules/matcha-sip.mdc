@@ -6,46 +6,79 @@ alwaysApply: false
 # GRC Audit Tool (matcha-sip) Documentation
 
 ## Overview
-The GRC Audit Tool, specifically `matcha-sip.py`, is a GitHub Pull Request auditing utility that generates reports of merged pull requests within a specified timeframe. The tool is designed to help teams track and review their pull request history across multiple repositories.
+The GRC Audit Tool, specifically `matcha-sip.py`, is a GitHub Pull Request auditing utility that generates CSV reports of merged pull requests within a specified timeframe. The tool is designed to help teams track and review their pull request history across multiple repositories in a format that's easy to analyze and share with auditors.
 
 ## Key Features
 - Fetches merged pull requests from specified GitHub repositories
-- Filters PRs by date range (currently set for 2024)
+- Interactive prompts for all configuration (owner, repos, date range, output directory)
 - Handles GitHub API rate limiting with retry mechanism
-- Generates formatted text reports for each repository
+- Generates CSV files for easy import into spreadsheet applications
+- Includes author information for each pull request
 - Includes error handling and failed request logging
+- Clear instructions for entering multiple repositories
 
 ## Prerequisites
 Before running the tool, you need:
 1. GitHub Personal Access Token with appropriate permissions
-2. List of repositories to audit
-3. Output directory for reports
+2. Python 3.x with virtual environment support
 
 ## Environment Variables
-The following environment variables must be set:
+Only one environment variable needs to be set in the `.env` file:
 
 ```bash
-export GITHUB_TOKEN="your-github-token"        # Your GitHub API authentication token
-export REPOS="repo1,repo2,repo3"              # Comma-separated list of repository names
-export OUTPUT_DIR="~/pr-reports"              # Directory for output files
+GITHUB_TOKEN="your-github-token"        # Your GitHub API authentication token
 ```
+
+All other configuration is provided interactively when running the script.
+
+## Interactive Inputs
+When you run the script, it will prompt you for:
+
+1. **Repository Owner**
+   - The GitHub organization or username that owns the repositories
+   - Example: `microsoft`, `google`, or your GitHub username
+
+2. **Repository Names**
+   - You can enter repositories in two ways:
+     - **Option 1**: All at once, comma-separated: `repo1,repo2,repo3`
+     - **Option 2**: One at a time (press Enter after each, then Enter on empty line when done)
+
+3. **Start Date**
+   - Format: `YYYY-MM-DD`
+   - Example: `2024-01-01`
+
+4. **End Date**
+   - Format: `YYYY-MM-DD`
+   - Example: `2024-12-31`
+
+5. **Output Directory**
+   - Where to save the audit reports
+   - Examples: `~/pr-reports`, `./output`, `/Users/username/audit-reports`
+   - Directory will be created if it doesn't exist
 
 ## Output Format
-For each repository, the tool generates a text file (`{repo-name}.txt`) containing:
+For each repository, the tool generates a CSV file (`{repo-name}.csv`) containing:
 
-```
-Pull Requests for {REPO} between {start_date} and {end_date}
---------------------------------------------------------------------------------
+### CSV Headers:
+- PR Number
+- Title
+- Author
+- Merged At
+- URL
 
-#{pr_number} - {pr_title}
-Merged at: {merged_at}
-URL: {url}
-
-[Additional PRs...]
-
-Failed Requests:
---------------------------------------------------------------------------------
-[Any API request failures are listed here]
+### File Contents:
+```csv
+PR Number,Title,Author,Merged At,URL
+# Repository: owner/repo,,,,
+# Date Range: 2024-01-01 to 2024-12-31,,,,
+# Total PRs: 42,,,,
+,,,,
+#123,Fix critical bug in authentication,jsmith,2024-03-15T10:30:00Z,https://github.com/owner/repo/pull/123
+#124,Add new feature for user profiles,mjones,2024-03-16T14:45:00Z,https://github.com/owner/repo/pull/124
+...
+,,,,
+# Failed Requests:,,,,
+# Page 15,Rate limit exceeded,,,,
 ```
 
 ## Technical Details
@@ -57,50 +90,66 @@ Failed Requests:
 - Features a 3-attempt retry mechanism for rate limit issues
 
 ### Data Collection Process
-1. Iterates through each repository in `REPOS`
-2. Fetches closed pull requests page by page
-3. Filters for:
+1. Prompts user for all necessary configuration
+2. Iterates through each repository provided
+3. Fetches closed pull requests page by page
+4. Filters for:
    - Merged PRs only
    - PRs within specified date range
-4. Collects PR metadata:
+5. Collects PR metadata:
    - PR number
    - Title
+   - Author username
    - Merge timestamp
    - HTML URL
 
 ### Error Handling
+- Validates all user inputs
 - Checks API rate limits proactively
 - Retries failed requests up to 3 times
-- Logs failed requests in output files
+- Logs failed requests in CSV files
 - Provides helpful error messages for common issues (e.g., SSO configuration)
 
 ## Usage
 
-1. Set up environment variables:
+1. Set up environment:
 ```bash
-export GITHUB_TOKEN="your-github-token"
-export REPOS="repo1,repo2,repo3"
-export OUTPUT_DIR="~/pr-reports"
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Unix/macOS
+# or
+.venv\Scripts\activate  # On Windows
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-2. Run the script:
+2. Create `.env` file with your GitHub token:
+```bash
+echo "GITHUB_TOKEN=your_token_here" > .env
+```
+
+3. Run the script:
 ```bash
 python matcha-sip.py
 ```
 
-3. Check the output directory for generated reports
+4. Follow the interactive prompts
+
+5. Check the output directory for generated CSV files
 
 ## Best Practices
 - Ensure your GitHub token has appropriate permissions
 - Enable SSO if required for your organization
 - Monitor rate limits when auditing many repositories
 - Keep the token secure and never commit it to version control
+- Use descriptive output directory names for different audit periods
+- Import CSV files into Excel or Google Sheets for further analysis
 
 ## Limitations
-- Currently hardcoded to audit PRs from 2024
-- Outputs in text format only
-- Requires manual environment variable setup
+- Outputs in CSV format only
 - Limited to merged pull requests only
+- Processes repositories sequentially (not in parallel)
 
 ## Error Messages
 Common error messages and their solutions:
@@ -117,11 +166,12 @@ Common error messages and their solutions:
 
 ## Future Improvements
 Potential enhancements could include:
-- Configurable date ranges
-- CSV/JSON output formats
-- Command-line arguments for configuration
+- Additional output formats (JSON, Excel)
+- Concurrent repository processing
 - Support for GitHub Enterprise
-- Concurrent repository processing 
+- Filtering by PR labels or authors
+- Progress bar for long-running audits
+- Summary statistics across all repositories
 
 # Branch Naming Guide
 
